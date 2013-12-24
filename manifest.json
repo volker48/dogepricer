@@ -8,7 +8,8 @@
   "author": "Marcus McCurdy",
 
   "permissions": [
-    "http://pubapi.cryptsy.com/"
+    "http://pubapi.cryptsy.com/",
+    "https://vircurex.com/api/*"
    ],
     
   "icons": { 
