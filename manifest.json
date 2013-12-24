@@ -3,8 +3,9 @@
 
   "name": "Doge Pricer",
   "short_name": "Doge Pricer",
-  "description": "Extension that pulls the last trade price of DOGE in BTC from Cryptsy's API",
-  "version": "1.0",
+  "description": "Extension that pulls the last trade price of DOGE in BTC from
+  Cryptsy and Vircurex API.",
+  "version": "1.1",
   "author": "Marcus McCurdy",
 
   "permissions": [
