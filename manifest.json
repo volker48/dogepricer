@@ -8,6 +8,8 @@
   "version": "1.1",
   "author": "Marcus McCurdy",
 
+  "content_security_policy": "script-src 'self' https://ssl.google-analytics.com; object-src 'self'",
+
   "permissions": [
     "http://pubapi.cryptsy.com/",
     "https://vircurex.com/api/*"
