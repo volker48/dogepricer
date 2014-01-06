@@ -3,8 +3,6 @@ var apiErrorMessage = 'API Error';
 function afterMarketChecks(marketData) {
     if (marketData.vircurexDone && marketData.cryptsyDone) {
         console.log('Both markets done');
-        delete marketData.vircurexDone;
-        delete marketData.cryptsyDone;
         var message = 'Cryptsy Price: ' + marketData.cryptsy + '\n';
         message += 'Vircurex Price: ' + marketData.vircurex;
         DogeHelper.showNotification('Doge Price Alert', message);
