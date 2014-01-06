@@ -1,33 +1,56 @@
-var DogeHelper = (function() {
-   var marketData = {};
+var DogeHelper = (function () {
+    var marketData = {};
 
-   function updateCryptsy() {
-       $('#cryptsyLastTrade').html(marketData.cryptsy.lasttradeprice);
-   }
+    function storeCryptsy(data) {
+        marketData.cryptsy = data.return.markets.DOGE.lasttradeprice;
+        marketData.cryptsySuccess(marketData);
+    }
 
-   function updateVircurex() {
-       $('#vircurexLastTrade').html(marketData.vircurex);
-   }
+    function storeVircurex(data) {
+        marketData.vircurex = data.value;
+        marketData.vircurexSuccess(marketData);
+    }
 
-   function storeCryptsy(data) {
-      marketData.cryptsy = data.return.markets.DOGE; 
-      updateCryptsy();
-   }
+    function scheduleMarketData() {
+        chrome.alarms.create('checkMarkets', {periodInMinutes: 5});
+    }
 
-   function storeVircurex(data) {
-       marketData.vircurex = data.value
-       updateVircurex();    
-   }
 
-   function getMarketData() {
-       $.get('http://pubapi.cryptsy.com/api.php?method=singlemarketdata&marketid=132', storeCryptsy);
-       $.get('https://vircurex.com/api/get_last_trade.json?base=DOGE&alt=BTC', storeVircurex);
-   }
+    function getMarketData(params) {
+        if (params.scheduleRequest) {
+            scheduleMarketData();
+        }
+        marketData.cryptsySuccess = params.cryptsySuccess;
+        marketData.vircurexSuccess = params.vircurexSuccess;
+        $.get('http://pubapi.cryptsy.com/api.php?method=singlemarketdata&marketid=132', storeCryptsy).fail(params.cryptsyFail);
+        $.get('https://vircurex.com/api/get_last_trade.json?base=DOGE&alt=BTC', storeVircurex).fail(params.vircurexFail);
+    }
 
-   return { getMarketData: getMarketData};
+    function showNotification(title, message) {
+        if (chrome.notifications) {
+            //The notifications seem to be buggy and despite what the docs say
+            //if you've already displayed the notification once
+            // unless you clear it first it won't show up after the first call.
+            chrome.notifications.clear('priceAlert', function (wasCleared) {
+                chrome.notifications.create('priceAlert',
+                    {
+                        title: title,
+                        message: message,
+                        type: 'basic',
+                        iconUrl: 'icon48.png'
+                    },
+                    function (notificationID) {
+                        //don't care we know the ID it's asinine this is required
+                    }
+                );
+            });
+
+        } else if (webkitNotifications) {
+            //old chrome
+            var notification = webkitNotifications.create('icon48.png', title, message);
+            notification.show();
+        }
+    }
+
+    return { getMarketData: getMarketData, showNotification: showNotification};
 })();
-
-
-$(function() {
-    DogeHelper.getMarketData();
-});

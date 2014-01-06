@@ -3,22 +3,31 @@
 
   "name": "Doge Pricer",
   "short_name": "Doge Pricer",
-  "description": "Extension that pulls the last trade price of DOGE in BTC from
-  Cryptsy and Vircurex API.",
-  "version": "1.1",
+  "description": "Extension that pulls the last trade price of DOGE in BTC from Vircurex API.",
+  "version": "2.0",
   "author": "Marcus McCurdy",
 
   "content_security_policy": "script-src 'self' https://ssl.google-analytics.com; object-src 'self'",
 
+  "options_page": "options.html",
+
   "permissions": [
+    "alarms",
     "http://pubapi.cryptsy.com/",
-    "https://vircurex.com/api/*"
+    "https://vircurex.com/api/*",
+    "storage",
+    "notifications"
    ],
     
   "icons": { 
     "16": "icon16.png",
     "48": "icon48.png",
     "128": "icon128.png" 
+  },
+
+  "background": {
+    "scripts": ["jquery-2.0.3.min.js", "main.js", "eventPage.js"],
+    "persistent": false
   },
 
   "browser_action": {
