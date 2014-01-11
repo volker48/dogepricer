@@ -11,7 +11,14 @@ var DogeHelper = (function () {
     }
 
     function scheduleMarketData() {
-        chrome.alarms.create('checkMarkets', {periodInMinutes: 5});
+        chrome.storage.sync.get(['polling_frequency'], function(items) {
+            var timeout = 5;
+            if (items.polling_frequency) {
+                timeout = items.polling_frequency;
+            }
+            chrome.alarms.create('checkMarkets', {periodInMinutes: timeout});
+        });
+
     }
 
     function wrapCallback(marketData, storeCallback, successCallback) {
