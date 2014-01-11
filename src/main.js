@@ -40,7 +40,7 @@ var DogeHelper = (function () {
                         title: title,
                         message: message,
                         type: 'basic',
-                        iconUrl: 'icon48.png'
+                        iconUrl: 'img/icon48.png'
                     },
                     function (notificationID) {
                         //don't care we know the ID it's asinine this is required
