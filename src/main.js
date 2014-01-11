@@ -15,7 +15,7 @@ var DogeHelper = (function () {
     }
 
     function wrapCallback(marketData, storeCallback, successCallback) {
-        return function(data) {
+        return function (data) {
             storeCallback(data, marketData, successCallback);
         }
     }

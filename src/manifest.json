@@ -35,7 +35,7 @@
         "19": "img/icon19.png",
         "38": "img/icon38.png"
     },
-    "default_title": "DOGE Price",
+    "default_title": "DOGE Pricer",
     "default_popup": "popup.html"
   }
 }
