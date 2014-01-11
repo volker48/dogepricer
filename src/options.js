@@ -4,10 +4,10 @@ $(function () {
         $polling_frequency = $('#polling-frequency');
 
     function save_options() {
-        var polling_frequency = parseInt($polling_frequency.val()),
+        var polling_frequency = parseFloat($polling_frequency.val()),
             tooFast = false;
-        if (polling_frequency < 1) {
-            polling_frequency = 1;
+        if (polling_frequency < 1.0) {
+            polling_frequency = 1.0;
             tooFast = true;
         }
         var alerts = {
@@ -21,11 +21,12 @@ $(function () {
             var message = "Options Saved.";
             if (tooFast) {
                 message += " Your polling frequency is too fast it has been set to every minute";
+                $polling_frequency.val('1.0');
             }
             status.innerHTML = message;
             setTimeout(function () {
                 status.innerHTML = "";
-            }, 1000);
+            }, 2000);
         }
 
         chrome.storage.sync.set(alerts, postStorageSet);
