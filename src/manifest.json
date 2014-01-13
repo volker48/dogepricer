@@ -7,14 +7,13 @@
   "version": "2.0",
   "author": "Marcus McCurdy",
 
-  "content_security_policy": "script-src 'self' https://ssl.google-analytics.com; object-src 'self'",
-
   "options_page": "options.html",
 
   "permissions": [
     "alarms",
     "http://pubapi.cryptsy.com/",
     "https://vircurex.com/api/*",
+    "https://api.coindesk.com/v1/bpi/currentprice.json",
     "storage",
     "notifications"
    ],

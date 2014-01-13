@@ -40,13 +40,13 @@ function vircurexSuccess(marketData) {
     afterMarketChecks(marketData);
 }
 
-function cryptsyFail(marketData) {
+function cryptsyFail(error, marketData) {
     marketData.cryptsyDone = true;
     marketData.cryptsyFailed = true;
     marketData.cryptsy = apiErrorMessage;
 }
 
-function vircurexFail(marketData) {
+function vircurexFail(error, marketData) {
     marketData.vircurexDone = true;
     marketData.vircurexFailed = true;
     marketData.vircurex = apiErrorMessage;
