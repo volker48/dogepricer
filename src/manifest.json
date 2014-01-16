@@ -4,7 +4,7 @@
   "name": "Doge Pricer",
   "short_name": "Doge Pricer",
   "description": "Extension that pulls the last trade price of DOGE in BTC from Vircurex API.",
-  "version": "2.1",
+  "version": "2.2",
   "author": "Marcus McCurdy",
 
   "options_page": "options.html",
