@@ -17,7 +17,9 @@
     "storage",
     "notifications"
    ],
-    
+
+  "content_security_policy": "script-src 'self' https://*.uservoice.com; object-src 'self'",
+
   "icons": { 
     "16": "img/icon16.png",
     "48": "img/icon48.png",
