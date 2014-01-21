@@ -70,7 +70,9 @@ function onInit() {
     var params = {
         scheduleRequest: true,
         cryptsySuccess: cryptsySuccess,
-        vircurexSuccess: vircurexSuccess
+        vircurexSuccess: vircurexSuccess,
+        vircurexFail: vircurexFail,
+        cryptsyFail: cryptsyFail
     };
     DogeHelper.getMarketData(params);
 }
@@ -81,7 +83,9 @@ chrome.runtime.onStartup.addListener(function () {
     var params = {
         scheduleRequest: true,
         cryptsySuccess: cryptsySuccess,
-        vircurexSuccess: vircurexSuccess
+        vircurexSuccess: vircurexSuccess,
+        vircurexFail: vircurexFail,
+        cryptsyFail: cryptsyFail
     };
     DogeHelper.getMarketData(params);
 });
