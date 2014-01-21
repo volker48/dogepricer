@@ -3,3 +3,8 @@ body {
     color: red;
     width: 500px;
 }
+
+#settings-div {
+    float: right;
+    cursor: pointer;
+}

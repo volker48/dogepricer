@@ -4,6 +4,12 @@ $(function () {
         usdCryptsyEle = $('#usdCryptsyConversion'),
         usdVircurexEle = $('#usdVircurexConversion');
 
+    function open_options_tab() {
+        chrome.tabs.create({url: "options.html"});
+    }
+
+    $('#settings-div').click(open_options_tab);
+
     chrome.runtime.getBackgroundPage(function (backgroundPage) {
         var apiErrorMsg = 'API Error';
         function updateAPI(id, message) {
