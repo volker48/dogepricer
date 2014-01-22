@@ -1,24 +1,27 @@
 var DogeHelper = (function () {
 
-    function storeCryptsy(data, marketData, cryptsySuccess) {
-        marketData.cryptsy = data.return.markets.DOGE.lasttradeprice;
-        cryptsySuccess(marketData);
+    function storeCryptsy(data) {
+        return new Promise(function (resolve) {
+            resolve(data.return.markets.DOGE.lasttradeprice);
+        });
     }
 
-    function storeVircurex(data, marketData, vircurexSuccess) {
-        marketData.vircurex = data.value;
-        vircurexSuccess(marketData);
+    function storeVircurex(data) {
+        return new Promise(function (resolve) {
+            resolve(data.value);
+        });
     }
 
 
-    function storeCoindesk(data, marketData, coindeskSuccess){
-        marketData.usdRate = data.bpi.USD.rate;
-        coindeskSuccess(marketData)
-    }
+    function storeCoindesk(data) {
+        return new Promise(function (resolve) {
+            resolve(data.bpi.USD.rate);
+        });
 
+    }
 
     function scheduleMarketData() {
-        chrome.storage.sync.get(['polling_frequency'], function(items) {
+        chrome.storage.sync.get(['polling_frequency'], function (items) {
             var timeout = 5;
             if (items.polling_frequency) {
                 timeout = items.polling_frequency;
@@ -28,36 +31,23 @@ var DogeHelper = (function () {
 
     }
 
-    function wrapCallback(marketData, storeCallback, successCallback) {
-        return function (data) {
-            storeCallback(data, marketData, successCallback);
-        }
-    }
-
-    function wrapFailure(marketData, failureCallback) {
-        return function(error) {
-            failureCallback(error, marketData);
-        };
-    }
-
     function getMarketData(params) {
         if (params.scheduleRequest) {
             scheduleMarketData();
         }
-        var marketData = {};
-        $.get('http://pubapi.cryptsy.com/api.php?method=singlemarketdata&marketid=132', wrapCallback(marketData, storeCryptsy, params.cryptsySuccess)).fail(wrapFailure(marketData, params.cryptsyFail));
-        $.get('https://vircurex.com/api/get_last_trade.json?base=DOGE&alt=BTC', wrapCallback(marketData, storeVircurex, params.vircurexSuccess)).fail(wrapFailure(marketData, params.vircurexFail));
+        var promises = {};
+        promises.cryptsy = Promise.cast($.get('http://pubapi.cryptsy.com/api.php?method=singlemarketdata&marketid=132')).then(storeCryptsy);
+        promises.vircurex = Promise.cast($.get('https://vircurex.com/api/get_last_trade.json?base=DOGE&alt=BTC')).then(storeVircurex);
         if (params.coindeskSuccess) {
-            $.ajax(
+            promises.coindesk = Promise.cast($.ajax(
                 {
                     url: 'https://api.coindesk.com/v1/bpi/currentprice.json',
-                    success: wrapCallback(marketData, storeCoindesk, params.coindeskSuccess),
-                    error: wrapFailure(marketData, params.coindeskFail),
                     dataType: 'JSON',
                     type: 'GET'
                 }
-            );
+            )).then(storeCoindesk);
         }
+        return promises;
     }
 
     function showNotification(title, message) {
