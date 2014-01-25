@@ -3,6 +3,8 @@ $(function () {
         vircurexEle = $('#vircurexLastTrade'),
         usdCryptsyEle = $('#usdCryptsyConversion'),
         usdVircurexEle = $('#usdVircurexConversion'),
+        yourCryptsyEle = $('#yourCryptsy'),
+        yourVircurexEle = $('#yourVircurex'),
         apiErrorMsg = 'API Error';
 
     function open_options_tab() {
@@ -35,12 +37,10 @@ $(function () {
     }
 
     function vircurexFail(error) {
-        console.log(error);
         updateAPI(vircurexEle, apiErrorMsg);
     }
 
     function coindeskFail(error) {
-        console.log(error);
         updateAPI(usdCryptsyEle, apiErrorMsg);
         updateAPI(usdVircurexEle, apiErrorMsg);
     }
@@ -48,7 +48,8 @@ $(function () {
     function updateUSDRates(settled) {
         var cryptsy = settled[0],
             vircurex = settled[1],
-            coindesk = settled[2];
+            coindesk = settled[2],
+            storage = settled[3].value();
 
         if (coindesk.isRejected()) {
             coindeskFail();
@@ -57,12 +58,20 @@ $(function () {
         if (vircurex.isRejected()) {
             updateAPI(usdVircurexEle, apiErrorMsg);
         } else {
-            updateAPI(usdVircurexEle, (coindesk.value() * vircurex.value()).toPrecision(2));
+            var vircurexUSDRate = coindesk.value() * vircurex.value();
+            updateAPI(usdVircurexEle, vircurexUSDRate.toPrecision(4));
+            if (storage.your_doge) {
+                updateAPI(yourVircurexEle, '$' + (vircurexUSDRate * storage.your_doge).toFixed(2));
+            }
         }
         if (cryptsy.isRejected()) {
             updateAPI(usdCryptsyEle, apiErrorMsg);
         } else {
-            updateAPI(usdCryptsyEle, (coindesk.value() * cryptsy.value()).toPrecision(2));
+            var cryptsyUSDRate = coindesk.value() * cryptsy.value();
+            updateAPI(usdCryptsyEle, cryptsyUSDRate.toPrecision(4));
+            if (storage.your_doge) {
+                updateAPI(yourCryptsyEle, '$' + (cryptsyUSDRate * storage.your_doge).toFixed(2));
+            }
         }
     }
 
@@ -75,6 +84,8 @@ $(function () {
     promises.cryptsy.then(cryptsySuccess).catch(cryptsyFail);
     promises.vircurex.then(vircurexSuccess).catch(vircurexFail);
 
-    Promise.settle([promises.cryptsy, promises.vircurex, promises.coindesk]).then(updateUSDRates);
+    var storagePromise = DogeHelper.syncGet(['your_doge']);
+
+    Promise.settle([promises.cryptsy, promises.vircurex, promises.coindesk, storagePromise]).then(updateUSDRates);
 
 });

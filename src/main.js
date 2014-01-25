@@ -76,5 +76,14 @@ var DogeHelper = (function () {
         }
     }
 
-    return { getMarketData: getMarketData, showNotification: showNotification};
+    function syncGet(items) {
+        return new Promise(function (resolve) {
+            chrome.storage.sync.get(items, function(items) {
+                resolve(items);
+            });
+        });
+    }
+
+    return { getMarketData: getMarketData,
+        showNotification: showNotification, syncGet: syncGet};
 })();
