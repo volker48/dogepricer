@@ -1,93 +1,58 @@
-var apiErrorMessage = 'API Error';
-
-function checkAlertThresholds(marketData) {
+function checkAlertThresholds(settled) {
     return function (items) {
         var showAlert = false;
-        if (items.price_rise && !marketData.cryptsyFailed) {
-            if (parseFloat(marketData.cryptsy) > items.price_rise ||
-                parseFloat(marketData.vircurex) > items.price_rise) {
-                showAlert = true;
+        if (items.price_rise) {
+            if (settled[0].isFulfilled()) {
+                if (parseFloat(settled[0].value()) > items.price_rise) {
+                    showAlert = true;
+                }
+            }
+            if (settled[1].isFulfilled()) {
+                if (parseFloat(settled[1].value()) > items.price_rise) {
+                    showAlert = true;
+                }
             }
         }
-        if (items.price_drop && !marketData.vircurexFailed) {
-            if (parseFloat(marketData.cryptsy) < items.price_drop ||
-                parseFloat(marketData.vircurex) < items.price_drop) {
-                showAlert = true;
+        if (items.price_drop) {
+            if (settled[0].isFulfilled()) {
+                if (parseFloat(settled[0].value()) < items.price_drop) {
+                    showAlert = true;
+                }
+            }
+            if (settled[1].isFulfilled()) {
+                if (parseFloat(settled[1].value()) < items.price_drop) {
+                    showAlert = true;
+                }
             }
         }
         if (showAlert) {
-            var message = 'Cryptsy Price: ' + marketData.cryptsy + '\n';
-            message += 'Vircurex Price: ' + marketData.vircurex;
+            var cryptsy = settled[0].isFulfilled() ? settled[0].value() : "Cryptsy Error";
+            var vircurex = settled[1].isFulfilled() ? settled[1].value() : "Vircurex Error";
+            var message = 'Cryptsy Price: ' + cryptsy + '\n';
+            message += 'Vircurex Price: ' + vircurex;
             DogeHelper.showNotification('Doge Price Alert', message);
         }
     };
 }
 
-
-function afterMarketChecks(marketData) {
-    if (marketData.vircurexDone && marketData.cryptsyDone) {
-        chrome.storage.sync.get(['price_rise', 'price_drop'], checkAlertThresholds(marketData));
-    }
-}
-
-function cryptsySuccess(marketData) {
-    marketData.cryptsyDone = true;
-    afterMarketChecks(marketData);
-}
-
-function vircurexSuccess(marketData) {
-    marketData.vircurexDone = true;
-    afterMarketChecks(marketData);
-}
-
-function cryptsyFail(error, marketData) {
-    marketData.cryptsyDone = true;
-    marketData.cryptsyFailed = true;
-    marketData.cryptsy = apiErrorMessage;
-}
-
-function vircurexFail(error, marketData) {
-    marketData.vircurexDone = true;
-    marketData.vircurexFailed = true;
-    marketData.vircurex = apiErrorMessage;
-}
-
 function onAlarm(alarm) {
     if (alarm && alarm.name === 'checkMarkets') {
-        var params = {
-            scheduleRequest: true,
-            cryptsySuccess: cryptsySuccess,
-            cryptsyFail: cryptsyFail,
-            vircurexSuccess: vircurexSuccess,
-            vircurexFail: vircurexFail
-
-        };
-        DogeHelper.getMarketData(params)
+        onInit();
     }
 }
 
 function onInit() {
     var params = {
-        scheduleRequest: true,
-        cryptsySuccess: cryptsySuccess,
-        vircurexSuccess: vircurexSuccess,
-        vircurexFail: vircurexFail,
-        cryptsyFail: cryptsyFail
+        scheduleRequest: true
     };
-    DogeHelper.getMarketData(params);
+    var promises = DogeHelper.getMarketData(params);
+    Promise.settle([promises.cryptsy, promises.vircurex]).then(function (settled) {
+        chrome.storage.sync.get(['price_rise', 'price_drop'], checkAlertThresholds(settled));
+    });
 }
 
 chrome.runtime.onInstalled.addListener(onInit);
 
-chrome.runtime.onStartup.addListener(function () {
-    var params = {
-        scheduleRequest: true,
-        cryptsySuccess: cryptsySuccess,
-        vircurexSuccess: vircurexSuccess,
-        vircurexFail: vircurexFail,
-        cryptsyFail: cryptsyFail
-    };
-    DogeHelper.getMarketData(params);
-});
+chrome.runtime.onStartup.addListener(onInit);
 
 chrome.alarms.onAlarm.addListener(onAlarm);
