@@ -77,13 +77,38 @@ var DogeHelper = (function () {
     }
 
     function syncGet(items) {
-        return new Promise(function (resolve) {
-            chrome.storage.sync.get(items, function(items) {
-                resolve(items);
+        return new Promise(function (resolve, reject) {
+            chrome.storage.sync.get(items, function (items) {
+                if (chrome.runtime.lastError) {
+                    reject(chrome.runtime.lastError);
+                } else {
+                    resolve(items);
+                }
             });
         });
     }
 
+    function getJSON(url) {
+        return new Promise(function (resolve, reject) {
+            var req = new XMLHttpRequest();
+            req.open('GET', url);
+            req.onreadystatechange = handler;
+            req.responseType = 'json';
+            req.setRequestHeader('Accept', 'application/json');
+            req.send();
+            function handler() {
+                if (this.readyState === this.DONE) {
+                    if (this.status === 200) {
+                        resolve(this.response);
+                    } else {
+                        reject(this);
+                    }
+                }
+            }
+        });
+    }
+
     return { getMarketData: getMarketData,
-        showNotification: showNotification, syncGet: syncGet};
+        showNotification: showNotification, syncGet: syncGet,
+        getJSON: getJSON};
 })();
