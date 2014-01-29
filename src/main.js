@@ -36,16 +36,12 @@ var DogeHelper = (function () {
             scheduleMarketData();
         }
         var promises = {};
-        promises.cryptsy = Promise.cast($.get('http://pubapi.cryptsy.com/api.php?method=singlemarketdata&marketid=132')).then(storeCryptsy);
-        promises.vircurex = Promise.cast($.get('https://vircurex.com/api/get_last_trade.json?base=DOGE&alt=BTC')).then(storeVircurex);
+        promises.cryptsy = getJSON('http://pubapi.cryptsy.com/api.php?method=singlemarketdata&marketid=132').then(storeCryptsy);
+        promises.vircurex = getJSON('https://vircurex.com/api/get_last_trade.json?base=DOGE&alt=BTC').then(storeVircurex);
         if (params.coindeskSuccess) {
-            promises.coindesk = Promise.cast($.ajax(
-                {
-                    url: 'https://api.coindesk.com/v1/bpi/currentprice.json',
-                    dataType: 'JSON',
-                    type: 'GET'
-                }
-            )).then(storeCoindesk);
+            promises.coindesk =
+                getJSON('https://api.coindesk.com/v1/bpi/currentprice.json')
+                    .then(storeCoindesk);
         }
         return promises;
     }
@@ -77,13 +73,38 @@ var DogeHelper = (function () {
     }
 
     function syncGet(items) {
-        return new Promise(function (resolve) {
-            chrome.storage.sync.get(items, function(items) {
-                resolve(items);
+        return new Promise(function (resolve, reject) {
+            chrome.storage.sync.get(items, function (items) {
+                if (chrome.runtime.lastError) {
+                    reject(chrome.runtime.lastError);
+                } else {
+                    resolve(items);
+                }
             });
         });
     }
 
+    function getJSON(url) {
+        return new Promise(function (resolve, reject) {
+            var req = new XMLHttpRequest();
+            req.open('GET', url);
+            req.onreadystatechange = handler;
+            req.responseType = 'json';
+            req.setRequestHeader('Accept', 'application/json');
+            req.send();
+            function handler() {
+                if (this.readyState === this.DONE) {
+                    if (this.status === 200) {
+                        resolve(this.response);
+                    } else {
+                        reject(this);
+                    }
+                }
+            }
+        });
+    }
+
     return { getMarketData: getMarketData,
-        showNotification: showNotification, syncGet: syncGet};
+        showNotification: showNotification, syncGet: syncGet,
+        getJSON: getJSON};
 })();
