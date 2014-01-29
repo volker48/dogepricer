@@ -36,16 +36,12 @@ var DogeHelper = (function () {
             scheduleMarketData();
         }
         var promises = {};
-        promises.cryptsy = Promise.cast($.get('http://pubapi.cryptsy.com/api.php?method=singlemarketdata&marketid=132')).then(storeCryptsy);
-        promises.vircurex = Promise.cast($.get('https://vircurex.com/api/get_last_trade.json?base=DOGE&alt=BTC')).then(storeVircurex);
+        promises.cryptsy = getJSON('http://pubapi.cryptsy.com/api.php?method=singlemarketdata&marketid=132').then(storeCryptsy);
+        promises.vircurex = getJSON('https://vircurex.com/api/get_last_trade.json?base=DOGE&alt=BTC').then(storeVircurex);
         if (params.coindeskSuccess) {
-            promises.coindesk = Promise.cast($.ajax(
-                {
-                    url: 'https://api.coindesk.com/v1/bpi/currentprice.json',
-                    dataType: 'JSON',
-                    type: 'GET'
-                }
-            )).then(storeCoindesk);
+            promises.coindesk =
+                getJSON('https://api.coindesk.com/v1/bpi/currentprice.json')
+                    .then(storeCoindesk);
         }
         return promises;
     }
