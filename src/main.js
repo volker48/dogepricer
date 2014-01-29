@@ -1,5 +1,7 @@
 var DogeHelper = (function () {
 
+    var SATOSHI = 100000000;
+
     function storeCryptsy(data) {
         return new Promise(function (resolve) {
             resolve(data.return.markets.DOGE.lasttradeprice);
@@ -38,6 +40,7 @@ var DogeHelper = (function () {
         var promises = {};
         promises.cryptsy = getJSON('http://pubapi.cryptsy.com/api.php?method=singlemarketdata&marketid=132').then(storeCryptsy);
         promises.vircurex = getJSON('https://vircurex.com/api/get_last_trade.json?base=DOGE&alt=BTC').then(storeVircurex);
+        Promise.any([promises.vircurex, promises.cryptsy]).then(DogeHelper.updateBadge);
         if (params.coindeskSuccess) {
             promises.coindesk =
                 getJSON('https://api.coindesk.com/v1/bpi/currentprice.json')
@@ -104,7 +107,11 @@ var DogeHelper = (function () {
         });
     }
 
+    function updateBadge(value) {
+        chrome.browserAction.setBadgeText({text: (value * SATOSHI).toString()});
+    }
+
     return { getMarketData: getMarketData,
         showNotification: showNotification, syncGet: syncGet,
-        getJSON: getJSON};
+        getJSON: getJSON, updateBadge: updateBadge};
 })();
