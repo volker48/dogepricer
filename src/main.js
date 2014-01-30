@@ -92,13 +92,12 @@ var DogeHelper = (function () {
             var req = new XMLHttpRequest();
             req.open('GET', url);
             req.onreadystatechange = handler;
-            req.responseType = 'json';
             req.setRequestHeader('Accept', 'application/json');
             req.send();
             function handler() {
                 if (this.readyState === this.DONE) {
                     if (this.status === 200) {
-                        resolve(this.response);
+                        resolve(JSON.parse(this.response));
                     } else {
                         reject(this);
                     }
