@@ -6,19 +6,19 @@ var $price_rise = document.getElementById('price-rise'),
 
 function save_options() {
     var polling_frequency = parseFloat($polling_frequency.value),
-        tooFast = false;
+        tooFast = false,
+        alerts = {};
 
     if (polling_frequency < 1.0) {
         polling_frequency = 1.0;
         tooFast = true;
     }
-
-    var alerts = {
-        price_rise: parseFloat($price_rise.value),
-        price_drop: parseFloat($price_drop.value),
-        polling_frequency: polling_frequency,
-        your_doge: parseFloat($your_doge.value)
-    };
+    if ($your_doge.value) {
+        alerts.your_doge = parseFloat($your_doge.value.replace(',', ''));
+    }
+    alerts.price_rise = parseFloat($price_rise.value);
+    alerts.price_drop = parseFloat($price_drop.value);
+    alerts.polling_frequency = polling_frequency;
 
     function postStorageSet() {
         var status = document.getElementById("status");
