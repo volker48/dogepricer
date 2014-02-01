@@ -12,7 +12,7 @@
   "permissions": [
     "alarms",
     "http://pubapi.cryptsy.com/",
-    "https://vircurex.com/api/*",
+    "https://api.vircurex.com/api/*",
     "https://api.coindesk.com/v1/bpi/currentprice.json",
     "storage",
     "notifications"
