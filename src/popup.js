@@ -4,6 +4,8 @@ var cryptsyEle = document.getElementById('cryptsyLastTrade'),
     usdVircurexEle = document.getElementById('usdVircurexConversion'),
     yourCryptsyEle = document.getElementById('yourCryptsy'),
     yourVircurexEle = document.getElementById('yourVircurex'),
+    dogePerUsdVircurexEle = document.getElementById('dogePerUsdVircurex'),
+    dogePerUsdCryptsyEle = document.getElementById('dogePerUsdCryptsy'),
     apiErrorMsg = 'API Error';
 
 function open_options_tab() {
@@ -58,7 +60,9 @@ function updateUSDRates(settled) {
         updateAPI(usdVircurexEle, apiErrorMsg);
     } else {
         var vircurexUSDRate = coindesk.value() * vircurex.value();
+        var vircurexDogePerUsd = 1.0 / vircurexUSDRate;
         updateAPI(usdVircurexEle, vircurexUSDRate.toPrecision(4));
+        updateAPI(dogePerUsdVircurexEle, vircurexDogePerUsd.toFixed(2));
         if (storage.your_doge) {
             updateAPI(yourVircurexEle, '$' + (vircurexUSDRate * storage.your_doge).toFixed(2));
         }
@@ -67,7 +71,9 @@ function updateUSDRates(settled) {
         updateAPI(usdCryptsyEle, apiErrorMsg);
     } else {
         var cryptsyUSDRate = coindesk.value() * cryptsy.value();
+        var cryptsyDogePerUsd = 1.0 / cryptsyUSDRate;
         updateAPI(usdCryptsyEle, cryptsyUSDRate.toPrecision(4));
+        updateAPI(dogePerUsdCryptsyEle, cryptsyDogePerUsd.toFixed(2));
         if (storage.your_doge) {
             updateAPI(yourCryptsyEle, '$' + (cryptsyUSDRate * storage.your_doge).toFixed(2));
         }
